@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    # Development database URL
+    url: jdbc:mysql://localhost:3306/auth_app?createDatabaseIfNotExist=true
+
+    # DB username
+    username: root
+
+    # DB password
+    password: Akash@2002
+
+  jpa:
+    hibernate:
+      # Update DB schema automatically during development
+      ddl-auto: update
+
+    # Show SQL queries for debugging
+    show-sql: true

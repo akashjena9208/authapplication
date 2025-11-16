@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: auth-app-backend
+
+  #profile
+  profiles:
+    active: dev   # change to 'prod' when needed
+
+#server port number
+server:
+  port: 8082
+

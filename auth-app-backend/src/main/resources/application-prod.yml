@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    # Production database URL
+    url: jdbc:mysql://localhost:3306/auth_app
+
+    # Production DB username
+    username: root
+
+    # Production DB password
+    password: YOUR_PROD_PASSWORD
+
+  jpa:
+    hibernate:
+      # Never use update in production unless needed
+      ddl-auto: validate
+
+    # Usually false in production
+    show-sql: false
