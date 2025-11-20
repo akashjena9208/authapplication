@@ -1,18 +1,25 @@
 spring:
   datasource:
-    # Development database URL
     url: jdbc:mysql://localhost:3306/auth_app?createDatabaseIfNotExist=true
-
-    # DB username
     username: root
+    password: "Akash@2002"
 
-    # DB password
-    password: Akash@2002
+#  hikari:
+#    pool-name: neon-hikari
+#    maximum-pool-size: 10
+#    minimum-idle: 2
+#    idle-timeout: 30000        # 30s
+#    connection-timeout: 20000  # 20s
+#    max-lifetime: 1800000      # 30m (keep below Neon’s TCP idle timeouts)
+#    validation-timeout: 5000
+#    leak-detection-threshold: 0
+#    initialization-fail-timeout: -1  # don't fail app if DB is momentarily unavailable
 
   jpa:
     hibernate:
-      # Update DB schema automatically during development
-      ddl-auto: update
-
-    # Show SQL queries for debugging
-    show-sql: true
+      ddl-auto: update     # Auto schema update during development
+    show-sql: true         # Show SQL in console
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
