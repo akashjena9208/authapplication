@@ -1,4 +1,4 @@
-package com.akash.auth.entity.Enum;
+package com.akash.auth.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,8 +12,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class Role {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    private UUID id=UUID.randomUUID();
     @Id
-    private UUID id=UUID.randomUUID();
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     @Column(unique = true, nullable = false)
     private String name; // ROLE_USER, ROLE_ADMIN
 

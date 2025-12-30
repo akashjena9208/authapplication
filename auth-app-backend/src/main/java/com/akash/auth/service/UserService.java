@@ -1,21 +1,24 @@
 package com.akash.auth.service;
-import com.akash.auth.dto.UserCreateDTO;
-import com.akash.auth.dto.UserDTO;
-import com.akash.auth.dto.UserUpdateDTO;
+import com.akash.auth.dto.UserDto;
 import java.util.UUID;
 
 public interface UserService {
 
-    UserDTO createUser(UserCreateDTO createDTO);
+    UserDto createUser(UserDto userDto);
 
-    UserDTO getUserByEmail(String email);
+    UserDto getUserByEmail(String email);
 
-    UserDTO getUserById(UUID id);
+    UserDto getUserById(String userId);
 
-    Iterable<UserDTO> getAllUsers();
+    Iterable<UserDto> getAllUsers();// I used Iterable to keep the service contract generic and avoid coupling to a specific collection type. It also aligns with Spring Data’s findAll() method
+    //List<UserDTO> getAllUsers(); //Why people usually prefer List bcz
+    // | Reason          | Explanation                   |
+    //| --------------- | ----------------------------- |
+    //| REST APIs       | JSON responses usually arrays |
+    //| Pagination      | `List` works better           |
+    //| Utility methods | size(), get(), stream()       |
+    UserDto updateUser(UserDto userDto, String userId);
 
-    UserDTO updateUser(UUID id, UserUpdateDTO updateDTO);
-
-    void deleteUser(UUID id);
+    void deleteUser(UUID userId);
 }
 
