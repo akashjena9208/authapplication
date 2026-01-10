@@ -66,6 +66,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 //http://localhost:8082/api/v1/users
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -122,9 +123,17 @@ public class UserController {
     // =========================
     // DELETE USER
     // =========================
+//    @DeleteMapping("/{userId}")
+//    public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
+//        userService.deleteUser(UUID.fromString(userId));
+//          return ResponseEntity.noContent().build();
+//    }
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
-        userService.deleteUser(UUID.fromString(userId));
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable UUID userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.ok(
+                Map.of("message", "User deleted successfully")
+        );
     }
+
 }
