@@ -39,6 +39,7 @@ public class User  implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Provider provider=Provider.LOCAL; // if we don't use any provider that time used Local(username,pw)
+    private  String providerId;
 
     @ManyToMany(fetch = FetchType.EAGER) //when we fetch the user that time in db roles also come    default is lazy so that reason we do egar
     @JoinTable(name = "user_roles",

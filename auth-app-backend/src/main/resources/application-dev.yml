@@ -23,6 +23,20 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
+  security:
+    #    oauth2 configurations
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:632111820338-vca2547rsnbpcjck8ma47hg33slnl497.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET: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}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            #/login/oauth2/code/google
+            scope:
+              - email
+              - profile
+              - openid
 
 
 logging:
@@ -41,3 +55,9 @@ security:
     cookie-http-only: ${JWT_COOKIE_HTTP_ONLY:true}
     cookie-same-site: ${JWT_COOKIE_SAME_SITE:lax}
     cookie-domain: ${JWT_COOKIE_DOMAIN:localhost}
+#632111820338-vca2547rsnbpcjck8ma47hg33slnl497.apps.googleusercontent.com
+
+app:
+  auth:
+    frontend:
+      success-redirect: http://localhost:3000/oauth2/success

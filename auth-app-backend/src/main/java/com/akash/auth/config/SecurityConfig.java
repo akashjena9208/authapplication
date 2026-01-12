@@ -19,12 +19,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @AllArgsConstructor
 @Configuration
 public class SecurityConfig {
     private  final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AuthenticationSuccessHandler successHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -50,6 +52,11 @@ public class SecurityConfig {
                         // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
+                .oauth2Login(oauth2 ->
+                        oauth2.successHandler(successHandler)
+                                .failureHandler(null)
+                )
+                .logout(AbstractHttpConfigurer::disable)
                 // Enable default Spring login page (browser)
                 //.formLogin(Customizer.withDefaults())
                 // Enable HTTP Basic (Postman / API clients)
