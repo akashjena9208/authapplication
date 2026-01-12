@@ -1,7 +1,7 @@
 package com.akash.auth.mapper;
 
 import com.akash.auth.dto.UserDto;
-import com.akash.auth.dto.enums.RoleDTO;
+import com.akash.auth.dto.RoleDTO;
 import com.akash.auth.entity.Role;
 import com.akash.auth.entity.User;
 

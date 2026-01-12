@@ -1,6 +1,5 @@
 package com.akash.auth.dto;
 
-import com.akash.auth.dto.enums.RoleDTO;
 import com.akash.auth.entity.enums.Provider;
 import lombok.Builder;
 import lombok.Setter;

@@ -24,6 +24,20 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
+
 logging:
-    level:
-      org.springframework.security: DEBUG
+  level:
+    org.springframework.security: DEBUG
+
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:akashjena;salaforcejavadevloeprvkasfbehwqpofhjashofjaswfpojasfvbafop[chiffon[shjfwefjjfslajfsahfoshffasnbash[f}ddvsdbcdcvv745devdedvdvv
+    issuer: ${JWT_ISSUER:api.akash.com}
+    access-ttl-seconds: ${JWT_ACCESS_TTL_SECONDS:600}
+    refresh-ttl-seconds: ${JWT_REFRESH_TTL_SECONDS:86400}
+    refresh-token-cookie-name: ${JWT_REFRESH_COOKIE_NAME:refreshToken}
+    cookie-secure: ${JWT_COOKIE_SECURE:true}
+    cookie-http-only: ${JWT_COOKIE_HTTP_ONLY:true}
+    cookie-same-site: ${JWT_COOKIE_SAME_SITE:lax}
+    cookie-domain: ${JWT_COOKIE_DOMAIN:localhost}

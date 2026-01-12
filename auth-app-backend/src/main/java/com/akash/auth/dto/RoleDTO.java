@@ -1,4 +1,4 @@
-package com.akash.auth.dto.enums;
+package com.akash.auth.dto;
 
 import java.util.UUID;
 
