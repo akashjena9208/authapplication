@@ -1,6 +1,7 @@
 package com.akash.auth.controller;
 
 import com.akash.auth.dto.LoginRequest;
+import com.akash.auth.dto.RefreshTokenRequest;
 import com.akash.auth.dto.TokenResponse;
 import com.akash.auth.dto.UserDto;
 import com.akash.auth.entity.RefreshToken;
@@ -36,6 +37,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -105,219 +108,136 @@ public class AuthController {
             throw new BadCredentialsException("Invalid Username or Password !!");
         }
     }
+
+
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refreshToken(
+            @RequestBody(required = false) RefreshTokenRequest body,
+            HttpServletResponse response,
+            HttpServletRequest request
+    ) throws InterruptedException {
+
+
+        //Thread.sleep(5000);
+
+        String refreshToken = readRefreshTokenFromRequest(body, request).orElseThrow(() -> new BadCredentialsException("Refresh token is missing"));
+
+
+        if(!jwtUtil.isRefreshToken(refreshToken)){
+            throw new BadCredentialsException("Invalid Refresh Token Type");
+        }
+
+        String jti = jwtUtil.getJti(refreshToken);
+        UUID userId = jwtUtil.getUserId(refreshToken);
+        RefreshToken storedRefreshToken = refreshTokenRepository.findByJti(jti).orElseThrow(() -> new BadCredentialsException("Refresh token not recognized"));
+
+        if(storedRefreshToken.isRevoked()){
+            throw new BadCredentialsException("Refresh token expired or revoked");
+        }
+
+        if(storedRefreshToken.getExpiresAt().isBefore(Instant.now())){
+            throw new BadCredentialsException("Refresh token expired");
+        }
+
+        if(!storedRefreshToken.getUser().getId().equals(userId)){
+            throw new BadCredentialsException("Refresh token does not belong to this user");
+        }
+
+        //refresh token ko rotate:
+        storedRefreshToken.setRevoked(true);
+        String newJti= UUID.randomUUID().toString();
+        storedRefreshToken.setReplacedByToken(newJti);
+        refreshTokenRepository.save(storedRefreshToken);
+
+        User user = storedRefreshToken.getUser();
+
+        var newRefreshTokenOb = RefreshToken.builder()
+                .jti(newJti)
+                .user(user)
+                .createdAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(jwtUtil.getRefreshTtlSeconds()))
+                .revoked(false)
+                .build();
+
+        refreshTokenRepository.save(newRefreshTokenOb);
+        String newAccessToken= jwtUtil.generateAccessToken(user);
+        String newRefreshToken = jwtUtil.generateRefreshToken(user, newRefreshTokenOb.getJti());
+
+
+        cookieService.attachRefreshCookie(response, newRefreshToken, (int) jwtUtil.getRefreshTtlSeconds());
+        cookieService.addNoStoreHeaders(response);
+        return ResponseEntity.ok(TokenResponse.of(newAccessToken, newRefreshToken, jwtUtil.getAccessTtlSeconds(),UserMapper.toDto(user)));
+
+    }
+
+    //this method will read refresh token from request header or body.
+    private Optional<String> readRefreshTokenFromRequest(RefreshTokenRequest body, HttpServletRequest request) {
+//            1. prefer reading refresh token from cookie
+        if (request.getCookies() != null) {
+
+            Optional<String> fromCookie = Arrays.stream(request.getCookies())
+                    .filter(c -> cookieService.getRefreshTokenCookieName().equals(c.getName()))
+                    .map(Cookie::getValue)
+                    .filter(v -> !v.isBlank())
+                    .findFirst();
+
+            if (fromCookie.isPresent()) {
+                return fromCookie;
+            }
+
+
+        }
+
+        // 2 body:
+        if (body != null && body.refreshToken() != null && !body.refreshToken().isBlank()) {
+            return Optional.of(body.refreshToken());
+        }
+
+        //3. custom header
+        String refreshHeader = request.getHeader("X-Refresh-Token");
+        if (refreshHeader != null && !refreshHeader.isBlank()) {
+            return Optional.of(refreshHeader.trim());
+        }
+
+        //Authorization = Bearer <token>
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.regionMatches(true, 0, "Bearer ", 0, 7)) {
+            String candidate = authHeader.substring(7).trim();
+            if (!candidate.isEmpty()) {
+                try {
+                    if (jwtUtil.isRefreshToken(candidate)) {
+                        return Optional.of(candidate);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        return Optional.empty();
+
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        readRefreshTokenFromRequest(null, request).ifPresent(token -> {
+            try {
+                if (jwtUtil.isRefreshToken(token)) {
+                    String jti = jwtUtil.getJti(token);
+                    refreshTokenRepository.findByJti(jti).ifPresent(rt -> {
+                        rt.setRevoked(true);
+                        refreshTokenRepository.save(rt);
+                    });
+                }
+            } catch (JwtException ignored) {
+            }
+        });
+
+        // Use CookieUtil (same behavior)
+        cookieService.clearRefreshCookie(response);
+        cookieService.addNoStoreHeaders(response);
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }
 
-/*
-1️⃣ AuthController → ORCHESTRATOR (API Layer)
-
-📍 Location
-
-controllers/AuthController
-
-
-📌 What YOU do here
-
-Expose REST APIs
-
-Call services & repositories
-
-Handle HTTP request / response
-
-Attach cookies
-
-Return tokens
-
-❌ What you do NOT do
-
-No password validation logic
-
-No JWT parsing logic
-
-No cookie creation logic
-
-2️⃣ /login → LOGIN FLOW
-📌 You do 5 things only
-✅ 1. Authenticate credentials
-authenticate(loginRequest);
-
-
-➡️ AuthenticationManager checks email + password
-➡️ Uses UserDetailsService internally
-
-✅ 2. Load user from DB
-userRepository.findByEmail(...)
-
-
-➡️ Needed for:
-
-user status
-
-token generation
-
-refresh token mapping
-
-✅ 3. Create & store refresh token (DB)
-RefreshToken.builder()
-
-
-➡️ Purpose:
-
-Track sessions
-
-Support logout
-
-Enable rotation
-
-📍 Stored in refresh_tokens table
-
-✅ 4. Generate JWTs
-jwtService.generateAccessToken(user);
-jwtService.generateRefreshToken(user, jti);
-
-Token	Used for
-Access Token	API authorization
-Refresh Token	Renew access token
-✅ 5. Attach refresh token to cookie
-cookieService.attachRefreshCookie(...)
-
-
-➡️ HTTP-only
-➡️ Secure from JS access
-➡️ Long lived
-
-3️⃣ /refresh → TOKEN RENEWAL FLOW
-📌 You are doing ADVANCED JWT DESIGN here 👏
-✅ Step 1. Read refresh token
-readRefreshTokenFromRequest()
-
-
-Priority order:
-
-Cookie (BEST)
-
-Request body
-
-Custom header
-
-Authorization header
-
-✅ Step 2. Validate token TYPE
-jwtService.isRefreshToken(token)
-
-
-➡️ Prevents access token misuse
-
-✅ Step 3. Validate DB refresh token
-
-You check:
-
-Exists
-
-Not revoked
-
-Not expired
-
-Belongs to same user
-
-📌 This blocks stolen token reuse
-
-✅ Step 4. Rotate refresh token
-oldToken.setRevoked(true);
-newToken = createNewRefreshToken();
-
-
-➡️ Old token is dead
-➡️ New token replaces it
-➡️ Strong security feature
-
-✅ Step 5. Issue new tokens
-
-New access token
-
-New refresh token
-
-Cookie updated
-
-4️⃣ /logout → SESSION TERMINATION
-📌 You do 3 things
-
-Read refresh token
-
-Revoke it in DB
-
-Clear cookie
-
-➡️ User is fully logged out
-➡️ Token cannot be reused
-
-5️⃣ JwtService → JWT BRAIN
-
-📍 security/JwtService
-
-📌 Responsible for:
-
-Token creation
-
-Claims
-
-Token type identification
-
-TTL
-
-Parsing & validation
-
-❌ Controller never parses JWT directly
-
-6️⃣ CookieService → COOKIE HANDLER
-
-📍 security/CookieService
-
-📌 Handles:
-
-HTTP-only cookie creation
-
-Secure flags
-
-Clearing cookies
-
-Cache headers
-
-➡️ Keeps controller clean
-
-7️⃣ RefreshTokenRepository → SESSION STORE
-
-📍 repositories/RefreshTokenRepository
-
-📌 Handles:
-
-Save refresh token
-
-Find by JTI
-
-Revoke tokens
-
-8️⃣ WHAT YOU HAVE NOT DONE YET (IMPORTANT)
-❗ Missing piece
-👉 JwtAuthenticationFilter
-
-This filter will:
-
-Read ACCESS TOKEN
-
-Validate it
-
-Set SecurityContext
-
-Without it:
-❌ Secured APIs won’t work
-
-🧠 SUMMARY (ONE LINE EACH)
-Component	Your Responsibility
-Controller	API orchestration
-AuthenticationManager	Credential check
-JwtService	Token logic
-CookieService	Cookie logic
-RefreshToken DB	Session tracking
-Refresh endpoint	Token rotation
-Logout	Token revocation
-*/
