@@ -82,27 +82,27 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
             }
 
-//            case "github" -> {
-//                String name = oAuth2User.getAttributes().getOrDefault("login", "").toString();
-//                String githubId = oAuth2User.getAttributes().getOrDefault("id", "").toString();
-//                String image = oAuth2User.getAttributes().getOrDefault("avatar_url", "").toString();
-//
-//                String email = (String) oAuth2User.getAttributes().get("email");
-//                if (email == null) {
-//                    email = name + "@github.com";
-//                }
-//
-//                User newUser = User.builder()
-//                        .email(email)
-//                        .name(name)
-//                        .image(image)
-//                        .enabled(true)
-//                        .provider(Provider.GITHUB)
-//                        .provider(Provider.valueOf(githubId))
-//                        .build();
-//                user = userRepository.findByEmail(email).orElseGet(() -> userRepository.save(newUser));
-//
-//            }
+            case "github" -> {
+                String name = oAuth2User.getAttributes().getOrDefault("login", "").toString();
+                String githubId = oAuth2User.getAttributes().getOrDefault("id", "").toString();
+                String image = oAuth2User.getAttributes().getOrDefault("avatar_url", "").toString();
+
+                String email = (String) oAuth2User.getAttributes().get("email");
+                if (email == null) {
+                    email = name + "@github.com";
+                }
+
+                User newUser = User.builder()
+                        .email(email)
+                        .name(name)
+                        .image(image)
+                        .enabled(true)
+                        .provider(Provider.GITHUB)
+                        .providerId(githubId)
+                        .build();
+                user = userRepository.findByEmail(email).orElseGet(() -> userRepository.save(newUser));
+
+            }
 
             default -> {
                 throw new RuntimeException("Invalid registration id");
