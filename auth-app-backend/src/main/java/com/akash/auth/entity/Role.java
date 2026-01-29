@@ -12,9 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class Role {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.UUID)
-//    private UUID id=UUID.randomUUID();
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

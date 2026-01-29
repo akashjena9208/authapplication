@@ -58,12 +58,14 @@
 //}
 package com.akash.auth.controller;
 
+import com.akash.auth.config.AppConstants;
 import com.akash.auth.dto.UserDto;
 import com.akash.auth.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 //http://localhost:8082/api/v1/users
 import java.util.Map;
@@ -76,42 +78,30 @@ public class UserController {
 
     private final UserService userService;
 
-    // =========================
-    // CREATE USER
-    // =========================
     @PostMapping
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
         UserDto createdUser = userService.createUser(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
-
-    // =========================
-    // GET USER BY ID
-    // =========================
+    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('"+ AppConstants.ADMIN_ROLE +"')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUserById(@PathVariable String userId) {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
 
-    // =========================
-    // GET USER BY EMAIL
-    // =========================
     @GetMapping("/email/{email}")
     public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
-    // =========================
-    // GET ALL USERS
-    // =========================
+
     @GetMapping
     public ResponseEntity<Iterable<UserDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    // =========================
-    // UPDATE USER
-    // =========================
+
     @PutMapping("/{userId}")
     public ResponseEntity<UserDto> updateUser(
             @PathVariable String userId,
@@ -120,14 +110,7 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(userDto, userId));
     }
 
-    // =========================
-    // DELETE USER
-    // =========================
-//    @DeleteMapping("/{userId}")
-//    public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
-//        userService.deleteUser(UUID.fromString(userId));
-//          return ResponseEntity.noContent().build();
-//    }
+
     @DeleteMapping("/{userId}")
     public ResponseEntity<Map<String, String>> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);

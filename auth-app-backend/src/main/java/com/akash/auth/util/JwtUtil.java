@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -80,7 +79,6 @@ public class JwtUtil {
     }
 
     //parse the token
-
     public Jws<Claims> parse(String token) {
         return Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
     }

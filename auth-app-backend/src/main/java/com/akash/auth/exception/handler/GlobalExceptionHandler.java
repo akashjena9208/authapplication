@@ -1,6 +1,4 @@
 package com.akash.auth.exception.handler;
-
-
 import com.akash.auth.dto.error.ApiError;
 import com.akash.auth.dto.error.ErrorResponse;
 import com.akash.auth.exception.ResourceNotFoundException;

@@ -39,24 +39,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
 
-            //token extract and validate then authentication create and then inside security context  set it.
-            //Extract Token
             String token = header.substring(7);
             try {
-                //if access work else  token refresh
                 if (!jwtUtil.isAccessToken(token)) {
-                    //message pass kar hai---
                     filterChain.doFilter(request, response);
                     return;
                 }
-                //We find Jwt token now we parse
                 Jws<Claims> parse = jwtUtil.parse(token);
                 Claims payload = parse.getPayload();
                 String userId = payload.getSubject();
                 UUID userUuid = UserHelper.parseUUID(userId);
                 userRepository.findById(userUuid).ifPresent(user -> {
-
-                    //check for user enable or not
 
                     if (user.isEnabled()) {
                         // we get user in database
@@ -86,16 +79,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
     @Override
-    // This method decides whether the filter should be skipped for a given request.
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         return request.getRequestURI().startsWith("/api/v1/auth");
-        // If the request URI starts with "/api/v1/auth",
-        // it means the request is for authentication endpoints (like login or register).
-        // We don't want to apply the filter here because users won't have a token yet.
-        // Returning 'true' tells Spring: "Do NOT run this filter for these requests."
-        //- Request: /api/v1/users
-        //→ shouldNotFilter returns false → filter runs → token is checked.
-        //- Request: /api/v1/auth/login
-        //→ shouldNotFilter returns true → filter is skipped → user can log in without a token
+
     }
 }

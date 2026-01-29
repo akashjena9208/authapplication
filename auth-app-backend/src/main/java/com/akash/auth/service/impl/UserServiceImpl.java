@@ -1,17 +1,18 @@
 package com.akash.auth.service.impl;
-
+import com.akash.auth.config.AppConstants;
 import com.akash.auth.dto.UserDto;
+import com.akash.auth.entity.Role;
 import com.akash.auth.entity.User;
 import com.akash.auth.entity.enums.Provider;
 import com.akash.auth.exception.ResourceNotFoundException;
 import com.akash.auth.helpers.UserHelper;
 import com.akash.auth.mapper.UserMapper;
+import com.akash.auth.repository.RoleRepository;
 import com.akash.auth.repository.UserRepository;
 import com.akash.auth.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.UUID;
 
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
     private  final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     @Override
     @Transactional
@@ -37,6 +39,11 @@ public class UserServiceImpl implements UserService {
         user.setProvider(
                 userDto.getProvider() != null ? userDto.getProvider() : Provider.LOCAL
         );
+
+        //assign the default role
+        Role role = roleRepository.findByName("ROLE_" + AppConstants.GUEST_ROLE).orElse(null);
+        user.getRoles().add(role);
+
         // 4️⃣ Persist
         User savedUser = userRepository.save(user);
         // 5️⃣ Entity → DTO (response-safe)

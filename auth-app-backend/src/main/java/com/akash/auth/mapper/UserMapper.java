@@ -48,7 +48,7 @@ public class UserMapper {
                 .id(entity.getId())
                 .email(entity.getEmail())
                 .name(entity.getName())
-                // ⚠️ password intentionally NOT mapped by default // .password(dto.getPassword())  //we not write this so when response time so null
+               .password(entity.getPassword())  //we not write this so when response time so null //  // ⚠️ password intentionally NOT mapped by default //
                 .image(entity.getImage())
                 .enable(entity.isEnabled())
                 .createdAt(entity.getCreatedAt())
@@ -58,9 +58,6 @@ public class UserMapper {
                 .build();
     }
 
-    // =========================
-    // ROLE MAPPERS
-    // =========================
     private static Set<Role> mapRolesToEntity(Set<RoleDTO> roleDTOs) {
 
         if (roleDTOs == null) {

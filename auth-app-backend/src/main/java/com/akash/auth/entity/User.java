@@ -47,8 +47,6 @@ public class User  implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    //@PrePersist and @PreUpdate They are JPA lifecycle callback annotations. They allow us to run code automatically before data is INSERTED into the database before data is UPDATED in the database
-    //@PrePersist why used bcz Before a new record is inserted into the database.To set values automatically, Especially for: createdAt updatedAt
     @PrePersist
     protected void onCreate() {
         Instant now = Instant.now();
@@ -57,7 +55,6 @@ public class User  implements UserDetails {
         }
         updatedAt = now;
     }
-// @PreUpdate – WHY we use it Before an existing record is updated. To update updatedAt every time data changes No need to manually write update logic
     @PreUpdate
     protected void onUpdate() {
         updatedAt = Instant.now();

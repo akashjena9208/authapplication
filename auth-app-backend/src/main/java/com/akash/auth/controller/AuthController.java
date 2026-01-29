@@ -35,7 +35,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
@@ -118,8 +117,6 @@ public class AuthController {
             HttpServletRequest request
     ) throws InterruptedException {
 
-
-        //Thread.sleep(5000);
 
         String refreshToken = readRefreshTokenFromRequest(body, request).orElseThrow(() -> new BadCredentialsException("Refresh token is missing"));
 
