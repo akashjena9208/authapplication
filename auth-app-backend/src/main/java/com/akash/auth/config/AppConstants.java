@@ -10,7 +10,7 @@ public class AppConstants {
             "/swagger-ui/**"
     };
 
-    //admin acess this url
+    //admin access this url
     public static final String[] AUTH_ADMIN_URLS= {
             "/api/v1/users/**"
     };

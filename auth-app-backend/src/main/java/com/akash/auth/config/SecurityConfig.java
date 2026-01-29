@@ -45,22 +45,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-//                .authorizeHttpRequests(auth -> auth
-//                        // Public APIs
-//                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login","/api/v1/auth/refresh","/api/v1/auth/logout").permitAll()
-//
-//                        // Everything else requires authentication
-//                        .anyRequest().authenticated()
-//                )
-//
-//                )
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests.requestMatchers(AppConstants.AUTH_PUBLIC_URLS).permitAll()
                                 .requestMatchers(AppConstants.AUTH_ADMIN_URLS).hasRole(AppConstants.ADMIN_ROLE)
                                 .requestMatchers(AppConstants.AUTH_GUEST_URLS).hasRole(AppConstants.GUEST_ROLE)
-//                                .requestMatchers(HttpMethod.GET).hasRole(AppConstants.GUEST_ROLE)
-//                                .requestMatchers("api/v1/users/**").hasRole(AppConstants.ADMIN_ROLE)
                                 .anyRequest().authenticated())
                 .oauth2Login(oauth2 ->
                         oauth2.successHandler(successHandler)
