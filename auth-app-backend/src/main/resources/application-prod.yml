@@ -1,18 +1,86 @@
+#development version of configurations
+server:
+  port: 8080
+
+#  database connections
 spring:
   datasource:
-    # Production database URL
-    url: jdbc:mysql://localhost:3306/auth_app
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
-    # Production DB username
-    username: root
-
-    # Production DB password
-    password: YOUR_PROD_PASSWORD
+  #    hikari:
+  #      pool-name: HikariCP
+  #      maximum-pool-size: 5
+  #      connection-timeout: 10000
+  #      idle-timeout: 600000
+  #      max-lifetime: 1800000
+  #      validation-timeout: 1800000
+  #      leak-detection-threshold: 0
+  #      initialization-fail-timeout: -1
 
   jpa:
     hibernate:
-      # Never use update in production unless needed
-      ddl-auto: validate
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: false
+    show-sql: true
+  security:
+    #    oauth2 configurations
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:test-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:test-client-secret}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            #/login/oauth2/code/google
+            scope:
+              - email
+              - profile
+              - openid
+          github:
+            client-id: ${GITHUB_CLIENT_ID:test-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:test-client-secret}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            #/login/oauth2/code/github
+            scope:
+              - user:email
+              - read:user
 
-    # Usually false in production
-    show-sql: false
+
+
+
+
+
+#    jpa and hibernate configurations
+
+
+
+
+
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:saiofal;vkasfbehwqpofhjashofjaswfpojasfvbafop[hfifonfo[shjfwefjjfslajfsahfoshffasnbash[f}
+    issuer: ${JWT_ISSUER:api.substring.com}
+    access-ttl-seconds: ${JWT_ACCESS_TTL_SECONDS:600}
+    refresh-ttl-seconds: ${JWT_REFRESH_TTL_SECONDS:86400}
+    refresh-token-cookie-name: ${JWT_REFRESH_COOKIE_NAME:refreshToken}
+    cookie-secure: ${JWT_COOKIE_SECURE:true}
+    cookie-http-only: ${JWT_COOKIE_HTTP_ONLY:true}
+    cookie-same-site: ${JWT_COOKIE_SAME_SITE:lax}
+    cookie-domain: ${JWT_COOKIE_DOMAIN:localhost}
+
+
+app:
+  cors:
+    front-end-url: ${FRONT_END_URL:http://localhost:5173}
+  auth:
+    frontend:
+      success-redirect: ${FRONT_END_SUCCESS_REDIRECT:http://localhost:5173/oauth/success}
+      failure-redirect: ${FRONT_END_FAILURE_REDIRECT:http://localhost:5173/oauth/failure}
+
+  ## docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod -e DB_URL=jdbc:mysql://host.docker.internal:3306/auth_app?createDatabaseIfNotExist=true -eDB_USERNAME=root -e DB_PASSWORD=Akash@2002 auth-app-backend
