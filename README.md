@@ -183,20 +183,20 @@ D:\Project\auth_app\auth-app-frontend\public
 
 ### 🏠 Landing Page
 ![Landing](/auth-app-frontend/public/img1.png)
-![Landing](image/img2.png)  
-![Landing](image/img3.png)
-![Landing](image/img4.png) 
+![Landing](/auth-app-frontend/public/image/img2.png)  
+![Landing](/auth-app-frontend/public/image/img3.png)
+![Landing](/auth-app-frontend/public/image/img4.png) 
 
 ### 🔑 Login & Registration 
-![Registrar](image/img5.png)
-![Login](image/img6.png)
+![Registrar](/auth-app-frontend/public/image/img5.png)
+![Login](/auth-app-frontend/public/image/img6.png)
 
 ### 📊 User Dashboard
-![Dashboard](image/img7.png)  
-![Dashboard](image/img8.png)
-![Fotter](image/img9.png)
+![Dashboard](/auth-app-frontend/public/image/img7.png)  
+![Dashboard](/auth-app-frontend/public/image/img8.png)
+![Fotter](/auth-app-frontend/public/image/img9.png)
 
 ### 👤 User Profile
-![Profile](image/img10.png)
+![Profile](/auth-app-frontend/public/image/img10.png)
 
 ---
