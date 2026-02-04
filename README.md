@@ -176,12 +176,13 @@ auth-app-backend
 ```bash npm install  
 npm run dev
 ```
+D:\Project\auth_app\auth-app-frontend\public
 ---
 
 ## 📸 Application Screenshots
 
 ### 🏠 Landing Page
-![Landing](image/img1.png)
+![Landing](/auth-app-frontend/public/img1.png)
 ![Landing](image/img2.png)  
 ![Landing](image/img3.png)
 ![Landing](image/img4.png) 
